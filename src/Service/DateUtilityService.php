@@ -8,9 +8,9 @@ use DateTimeInterface;
 
 final class DateUtilityService
 {
-    public function getNextDay(string $date): DateTimeInterface
+    public function getNextDay(DateTimeInterface $date): DateTimeInterface
     {
-        return (new \DateTime($date))->modify('+1 day');
+        return $date->modify('+1 day');
     }
 
 }

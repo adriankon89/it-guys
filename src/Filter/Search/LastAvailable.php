@@ -6,24 +6,21 @@ namespace App\Filter\Search;
 
 use App\DTO\AvailableTermsEnquiryInterface;
 use App\Entity\TimeSheet;
+use App\Service\DateUtilityService;
 
-final class LastAvailable extends BaseAvailableTermsSearch
+final class LastAvailable implements AvailableTermsSearchInterface
 {
+    public function __construct(
+        private DateUtilityService $dateUtilityService
+    ) {
+    }
     public function search(AvailableTermsEnquiryInterface $enquiry, TimeSheet ...$bookedTerms): AvailableTermsEnquiryInterface
     {
-        $availableFrom = $enquiry->getAvailableFrom();
-        $asapAvailableDate = '';
-        if (true === empty($bookedTerms)) {
-            $asapAvailableDate = $availableFrom;
-        } else {
-            $lastTerm = end($bookedTerms);
-            $endDateOfLastTerm = $lastTerm->getToDate()->format('Y-m-d');
-            $asapAvailableDate = $this->getNextDay($endDateOfLastTerm);
-        }
+        $asapAvailableDate = empty($bookedTerms) ?
+        $enquiry->getAvailableFrom() :
+        $this->dateUtilityService->getNextDay(end($bookedTerms)->getToDate());
 
-        if ($asapAvailableDate) {
-            $enquiry->addAvailableTerm($asapAvailableDate);
-        }
+        $enquiry->addAvailableTerm($asapAvailableDate);
 
         return $enquiry;
     }

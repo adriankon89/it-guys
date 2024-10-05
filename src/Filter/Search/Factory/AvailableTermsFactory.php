@@ -1,22 +1,35 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filter\Search\Factory;
 
-use App\Exception\AvailableTermsClassNotFound;
 use App\Filter\Search\AvailableTermsSearchInterface;
-use App\Service\DateUtilityService;
-use Symfony\Component\VarExporter\Exception\ClassNotFoundException;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class AvailableTermsFactory implements AvailableTermsFactoryInterface
 {
+    private ContainerInterface $container;
+    private array $searchTypeMap;
+
+    public function __construct(ContainerInterface $container, array $searchTypeMap)
+    {
+        $this->container = $container;
+        $this->searchTypeMap = $searchTypeMap;
+    }
+
     public function create(string $searchType): AvailableTermsSearchInterface
     {
-        $searchEngineClassBasename = str_replace('_', '', ucwords($searchType, '_'));
-        $searchEngine = self::SEARCH_MODIFIER_NAMESPACE . $searchEngineClassBasename;
-        if (!class_exists($searchEngine)) {
-            throw new AvailableTermsClassNotFound($searchEngine);
+        if (!isset($this->searchTypeMap[$searchType])) {
+            throw new NotFoundHttpException("Search type '{$searchType}' is not defined.");
         }
-        $dateUtilityService = new DateUtilityService();
-        return new $searchEngine($dateUtilityService);
+
+        $serviceId = $this->searchTypeMap[$searchType];
+
+        if (!$this->container->has($serviceId)) {
+            throw new NotFoundHttpException("The search engine '{$serviceId}' is not registered as a service.");
+        }
+        return $this->container->get($serviceId);
     }
 }

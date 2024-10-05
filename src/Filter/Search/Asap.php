@@ -6,12 +6,11 @@ use App\DTO\AvailableTermsEnquiryInterface;
 use App\Entity\TimeSheet;
 use App\Service\DateUtilityService;
 
-class Asap extends BaseAvailableTermsSearch
+class Asap implements AvailableTermsSearchInterface
 {
     public function __construct(
         private DateUtilityService $dateUtilityService
     ) {
-
     }
 
     public function search(AvailableTermsEnquiryInterface $enquiry, TimeSheet ...$bookedTerms): AvailableTermsEnquiryInterface
@@ -22,8 +21,8 @@ class Asap extends BaseAvailableTermsSearch
             $asapAvailableDate = $availableFrom;
         } else {
             foreach ($bookedTerms as $termId => $term) {
-                $startDate = $term->getFromDate()->format('Y-m-d');
-                $endDate = $term->getToDate()->format('Y-m-d');
+                $startDate = $term->getFromDate();
+                $endDate = $term->getToDate();
 
                 if (($startDate > $availableFrom) && ($termId === 0)) {
                     $asapAvailableDate = $availableFrom;
@@ -33,8 +32,7 @@ class Asap extends BaseAvailableTermsSearch
                 $nextDayAfterEndOfTerm = $this->dateUtilityService->getNextDay($endDate);
                 $nextTerm = next($bookedTerms);
                 if (true === (bool) $nextTerm) {
-                    $nextTermStartDate = $nextTerm->getFromDate()->format('Y-m-d');
-                    if ($nextTermStartDate > $endDate) {
+                    if ($nextTerm->getFromDate() > $endDate) {
                         $asapAvailableDate = $nextDayAfterEndOfTerm;
                         break;
                     }

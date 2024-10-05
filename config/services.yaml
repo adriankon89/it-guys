@@ -42,4 +42,21 @@ services:
                 - '@App\Filter\CompetenciesFilter\AtLeastOneCompetencyStrategy' 
     App\Filter\ItGuysWithCompetenciesFilter:
         arguments:
-            $aggregator: '@App\Filter\CompetenciesFilter\CompetenciesFilterAggregator'                   
+            $aggregator: '@App\Filter\CompetenciesFilter\CompetenciesFilterAggregator'   
+    App\Service\DateUtilityService: ~        
+    App\Filter\Search\Asap:
+        arguments:
+            $dateUtilityService: '@App\Service\DateUtilityService' 
+        public : true
+    App\Filter\Search\LastAvailable:
+        arguments:
+            $dateUtilityService: '@App\Service\DateUtilityService' 
+        public : true            
+    App\Filter\Search\Factory\AvailableTermsFactory:
+        arguments:
+            $container: '@service_container'
+            $searchTypeMap:
+                'asap': 'App\Filter\Search\Asap'
+                'last-available': 'App\Filter\Search\LastAvailable'
+        public : true        
+                                           
