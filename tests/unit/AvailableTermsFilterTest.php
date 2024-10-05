@@ -3,38 +3,54 @@
 namespace App\Tests\unit;
 
 use App\DTO\AvailableTermsEnquiry;
+use App\Entity\TimeSheet;
 use App\Filter\AvailableTermsFilter;
 use App\Tests\ServiceTestCase;
+use DateTime;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class AvailableTermsFilterTest extends ServiceTestCase
 {
-    //vendor/bin/phpunit tests/unit/AvailableTermsFilterTest
-
-    /** @test */
-    public function fancy_test_name_todo_on_weekend(): void
+    public function testAsapAvailableTermsFilter(): void
     {
         //given
-
-        $enquiry = new AvailableTermsEnquiry();
-
+        $date = new DateTime('now');
+        $availableTermsEnquiry = new AvailableTermsEnquiry();
+        $availableTermsEnquiry->setAvailableFrom($date->format('Y-m-d'));
+        $availableTermsEnquiry->setAvailableTo($date->format('Y-m-d'));
+        $availableTermsEnquiry->setAvailableType('last-available');
         $bookedTerms = $this->bookedTermsDataProvider();
 
-        $availableTermsFilter = $this->container->get(AvailableTermsFilter::class);
-        dd($availableTermsFilter);
-
         //when
-        //  $filteredEnquiry = $availableTermsFilter->apply($enquiry, ...$bookedTerms);
-
+        $availableTermsFilter = $this->container->get(AvailableTermsFilter::class);
+        $filteredEnquiry = $availableTermsFilter->apply($availableTermsEnquiry, ...$bookedTerms);
 
         //then
+        $nextAvailableDay = $filteredEnquiry->getAvailableDates()[0]->format('Y-m-d');
+        $tomorrowDate = (clone $date)->modify('+1 day')->format('Y-m-d');
+        $this->assertSame($nextAvailableDay, $tomorrowDate);
     }
 
     public function bookedTermsDataProvider()
     {
-        return [
-            ['2022-02-02' => '2022-02-02'],
-            ['2022-02-02' => '2022-02-02'],
+        $timeSheet = new TimeSheet();
+        $date = new DateTime('now');
+        $timeSheet->setFromDate($date);
+        $timeSheet->setToDate($date);
+        return [$timeSheet];
+    }
 
-        ];
+    public function testNotFoundFilter()
+    {
+        // given
+        $this->expectException(NotFoundHttpException::class);
+        $this->expectExceptionMessage("Search type 'strange-name' is not defined");
+
+        $availableTermsEnquiry = new AvailableTermsEnquiry();
+        $availableTermsEnquiry->setAvailableType('strange-name');
+
+        // when
+        $availableTermsFilter = $this->container->get(AvailableTermsFilter::class);
+        $availableTermsFilter->apply($availableTermsEnquiry, ...[]);
     }
 }
