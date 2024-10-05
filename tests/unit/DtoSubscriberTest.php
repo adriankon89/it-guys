@@ -4,8 +4,7 @@ namespace App\Tests\unit;
 
 use App\DTO\AvailableTermsEnquiry;
 use App\Tests\ServiceTestCase;
-use App\DTO\LowestPriceEnquiry;
-use App\Service\ServiceException;
+use App\Exception\ServiceException;
 use App\Event\AfterDtoCreatedEvent;
 use App\EventSubscriber\DtoSubscriber;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -20,7 +19,6 @@ class DtoSubscriberTest extends ServiceTestCase
     public function testValidateDto(): void
     {
         $dto = new AvailableTermsEnquiry();
-        // $dto->setQuantity(-5);
         $event = new AfterDtoCreatedEvent($dto);
         $dispatcher = $this->container->get(EventDispatcherInterface::class);
 
