@@ -41,7 +41,6 @@ final class AvailableTermsController extends AbstractController
         );
         $availableTermsEnquiry->setItGuy($itGuy);
         $bookedTerms = $cache->findItGuyBookedTerms($itGuy, $availableTermsEnquiry->getAvailableFrom());
-        // dd($bookedTerms, $itGuy->getId());
         $modifiedEnquiry = $availableTermsFilter->apply($availableTermsEnquiry, ...$bookedTerms);
 
         $responseContent = $serializer->serialize($modifiedEnquiry, 'json', [

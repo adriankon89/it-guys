@@ -14,7 +14,6 @@ final class CompetenceCache
         private CacheInterface $cache,
         private ItGuyRepository $repository,
     ) {
-
     }
     public function getItGuysWithCompetencies(): ?array
     {

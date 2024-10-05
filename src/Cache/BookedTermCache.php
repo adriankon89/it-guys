@@ -20,12 +20,6 @@ final class BookedTermCache
     }
     public function findItGuyBookedTerms(ItGuy $itGuy, DateTimeInterface $availableFrom): ?array
     {
-
-        return  $this->repository->findItGuyBookedTerms(
-            $itGuy,
-            $availableFrom
-        );
-
         return $this->cache->get("itguy-booked-terms-{$itGuy->getId()}", function (ItemInterface $item) use ($itGuy, $availableFrom) {
             return  $this->repository->findItGuyBookedTerms(
                 $itGuy,

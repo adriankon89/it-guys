@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\ItGuyRepository;
@@ -9,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ItGuyRepository::class)]
-class ItGuy
+final class ItGuy
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -28,16 +30,6 @@ class ItGuy
     {
         $this->competencies = new ArrayCollection();
     }
-
-    /*
-    #[ORM\OneToMany(targetEntity: TimeSheet::class, mappedBy: 'itguy')]
-    private Collection $timeSheets;
-
-    public function __construct()
-    {
-        $this->timeSheets = new ArrayCollection();
-    }
-    */
 
     public function getId(): ?int
     {

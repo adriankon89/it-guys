@@ -2,10 +2,11 @@
 
 namespace App\DTO;
 
-use App\Cache\BookedTermCache;
 use App\Entity\ItGuy;
 use DateTime;
 use DateTimeInterface;
+use Exception;
+use InvalidArgumentException;
 use Symfony\Component\Serializer\Annotation\Ignore;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\Context;
@@ -16,20 +17,15 @@ class AvailableTermsEnquiry implements BaseDtoInterface, AvailableTermsEnquiryIn
     #[Ignore]
     private ?ItGuy $itGuy = null;
     private ?string $location;
-
     #[Context([DateTimeNormalizer::FORMAT_KEY => 'Y-m-d'])]
     #[Assert\NotBlank]
     #[Assert\GreaterThan('today')]
     #[Assert\LessThanOrEqual(propertyPath: 'availableTo', message: 'The start date must be before or equal to the end date.')]
     private DateTimeInterface $availableFrom;
-
     #[Context([DateTimeNormalizer::FORMAT_KEY => 'Y-m-d'])]
-    #[Assert\NotBlank]
     private DateTimeInterface $availableTo;
     private ?string $availableType = null;
     private array $availableDates = [];
-
-
 
     public function getItGuy(): ?ItGuy
     {
@@ -58,7 +54,6 @@ class AvailableTermsEnquiry implements BaseDtoInterface, AvailableTermsEnquiryIn
 
     public function setAvailableFrom(string $availableFrom): self
     {
-
         $this->availableFrom = $this->convertToDateTime($availableFrom);
 
         return $this;
@@ -72,6 +67,7 @@ class AvailableTermsEnquiry implements BaseDtoInterface, AvailableTermsEnquiryIn
     public function setAvailableDates(array $availableDates): self
     {
         $this->availableDates = $availableDates;
+
         return $this;
     }
 
@@ -107,13 +103,12 @@ class AvailableTermsEnquiry implements BaseDtoInterface, AvailableTermsEnquiryIn
         return $this;
     }
 
-    private function convertToDateTime(?string $date): ?\DateTimeInterface
+    private function convertToDateTime(string $date): DateTimeInterface
     {
         try {
-            return $date ? new \DateTime($date) : null;
-        } catch (\Exception $e) {
-            // Handle invalid date formats or exceptions, e.g., log the error or set a default value
-            return null;
+            return  new DateTime($date);
+        } catch (Exception $e) {
+            throw new InvalidArgumentException("Invalid date format provided: {$date}. Error: " . $e->getMessage());
         }
     }
 }

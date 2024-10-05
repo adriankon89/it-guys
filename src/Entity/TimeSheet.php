@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\TimeSheetRepository;
@@ -7,7 +9,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TimeSheetRepository::class)]
-class TimeSheet
+final class TimeSheet
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -22,7 +24,7 @@ class TimeSheet
 
     #[ORM\ManyToOne(inversedBy: 'timeSheets')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?ItGuy $itguy = null;
+    private ?ItGuy $itGuy = null;
 
     public function getId(): ?int
     {
@@ -53,14 +55,14 @@ class TimeSheet
         return $this;
     }
 
-    public function getItguy(): ?ItGuy
+    public function getItGuy(): ?ItGuy
     {
-        return $this->itguy;
+        return $this->itGuy;
     }
 
-    public function setItguy(?ItGuy $itguy): static
+    public function setItGuy(?ItGuy $itGuy): static
     {
-        $this->itguy = $itguy;
+        $this->itGuy = $itGuy;
 
         return $this;
     }

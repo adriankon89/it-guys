@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Event;
 
-use App\DTO\AvailableTermsEnquiryInterface;
 use App\DTO\BaseDtoInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
