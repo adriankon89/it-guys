@@ -22,24 +22,3 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
-    App\Exception\ExceptionHandlerAggregator:
-        arguments:
-            $exceptionHandlers: 
-                - '@App\Exception\GenericExceptionHandler'
-                - '@App\Exception\HttpExceptionHandler'
-                - '@App\Exception\ServiceExceptionHandler'
-                - '@App\Exception\NotFoundExceptionHandler'
-    App\EventListener\ExceptionListener:
-        arguments:
-            $aggregator: '@App\Exception\ExceptionHandlerAggregator'
-        tags:
-            - { name: kernel.event_listener, event: kernel.exception }
-
-    App\Filter\CompetenciesFilter\CompetenciesFilterAggregator:
-        arguments:
-            $competenciesHandlers:
-                - '@App\Filter\CompetenciesFilter\StrictCompetenciesStrategy' 
-                - '@App\Filter\CompetenciesFilter\AtLeastOneCompetencyStrategy' 
-    App\Filter\ItGuysWithCompetenciesFilter:
-        arguments:
-            $aggregator: '@App\Filter\CompetenciesFilter\CompetenciesFilterAggregator'                   
