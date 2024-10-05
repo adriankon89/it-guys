@@ -5,6 +5,7 @@ namespace App\Filter\Search;
 use App\DTO\AvailableTermsEnquiryInterface;
 use App\Entity\TimeSheet;
 use App\Service\DateUtilityService;
+use DateTime;
 
 class Asap implements AvailableTermsSearchInterface
 {
@@ -13,18 +14,19 @@ class Asap implements AvailableTermsSearchInterface
     ) {
     }
 
-    public function search(AvailableTermsEnquiryInterface $enquiry, TimeSheet ...$bookedTerms): AvailableTermsEnquiryInterface
-    {
+    public function search(
+        AvailableTermsEnquiryInterface $enquiry,
+        TimeSheet ...$bookedTerms
+    ): AvailableTermsEnquiryInterface {
         $availableFrom = $enquiry->getAvailableFrom();
-        $asapAvailableDate = '';
-        if (empty($bookedTerms)) {
+        $asapAvailableDate = null;
+        if (true === empty($bookedTerms)) {
             $asapAvailableDate = $availableFrom;
         } else {
             foreach ($bookedTerms as $termId => $term) {
                 $startDate = $term->getFromDate();
                 $endDate = $term->getToDate();
-
-                if (($startDate > $availableFrom) && ($termId === 0)) {
+                if (($startDate->format('Y-m-d') > $availableFrom->format('Y-m-d')) && ($termId === 0)) {
                     $asapAvailableDate = $availableFrom;
                     break;
                 }
@@ -32,7 +34,7 @@ class Asap implements AvailableTermsSearchInterface
                 $nextDayAfterEndOfTerm = $this->dateUtilityService->getNextDay($endDate);
                 $nextTerm = next($bookedTerms);
                 if (true === (bool) $nextTerm) {
-                    if ($nextTerm->getFromDate() > $endDate) {
+                    if ($nextTerm->getFromDate()->format('Y-m-d') > $endDate->format('Y-m-d')) {
                         $asapAvailableDate = $nextDayAfterEndOfTerm;
                         break;
                     }
@@ -42,10 +44,10 @@ class Asap implements AvailableTermsSearchInterface
                 }
             }
         }
-
-        if ($asapAvailableDate) {
+        if (null !== $asapAvailableDate) {
             $enquiry->addAvailableTerm($asapAvailableDate);
         }
+
         return $enquiry;
     }
 }
