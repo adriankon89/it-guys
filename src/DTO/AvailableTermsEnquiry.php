@@ -61,7 +61,7 @@ class AvailableTermsEnquiry implements BaseDtoInterface, AvailableTermsEnquiryIn
 
     public function getAvailableDates(): array
     {
-        return  $this->availableDates;
+        return $this->availableDates;
     }
 
     public function setAvailableDates(array $availableDates): self

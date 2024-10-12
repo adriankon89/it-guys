@@ -17,7 +17,8 @@ final class AvailableTermsFilter implements AvailableTermsFilterInterface
 
     public function apply(AvailableTermsEnquiryInterface $enquiry, TimeSheet ...$bookedTerms): AvailableTermsEnquiryInterface
     {
-        $availableTerms = $this->availableTermsFactory->create($enquiry->getAvailableType());
+        $availableTerms = $this->availableTermsFactory
+            ->create($enquiry->getAvailableType());
         $availableTerms->search($enquiry, ...$bookedTerms);
         return $enquiry;
     }
