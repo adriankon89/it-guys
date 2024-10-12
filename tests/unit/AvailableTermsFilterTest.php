@@ -11,7 +11,10 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class AvailableTermsFilterTest extends ServiceTestCase
 {
-    public function testLastAvailableTermsFilter(): void
+    /**
+     * @dataProvider bookedTermsDataForTodayProvider
+     */
+    public function testLastAvailableTermsFilter(array $bookedTerms): void
     {
         //given
         $date = new DateTime('now');
@@ -19,7 +22,7 @@ class AvailableTermsFilterTest extends ServiceTestCase
         $availableTermsEnquiry->setAvailableFrom($date->format('Y-m-d'));
         $availableTermsEnquiry->setAvailableTo($date->format('Y-m-d'));
         $availableTermsEnquiry->setAvailableType('last-available');
-        $bookedTerms = $this->bookedTermsDataForTodayProvider();
+
 
         //when
         $availableTermsFilter = $this->container->get(AvailableTermsFilter::class);
@@ -50,7 +53,10 @@ class AvailableTermsFilterTest extends ServiceTestCase
         $this->assertSame($nextAvailableDay, $today);
     }
 
-    public function testAsapFilterForMoreTimeSheets(): void
+    /**
+     * @dataProvider bookedTermsWithMoreTimeSheetsDataProvider
+     */
+    public function testAsapFilterForMoreTimeSheets(array $bookedTerms): void
     {
         //given
         $date = new DateTime('now');
@@ -58,7 +64,6 @@ class AvailableTermsFilterTest extends ServiceTestCase
         $availableTermsEnquiry->setAvailableFrom($date->format('Y-m-d'));
         $availableTermsEnquiry->setAvailableTo($date->format('Y-m-d'));
         $availableTermsEnquiry->setAvailableType('asap');
-        $bookedTerms = $this->bookedTermsWithMoreTimeSheetsDataProvider();
 
         //when
         $availableTermsFilter = $this->container->get(AvailableTermsFilter::class);
@@ -83,7 +88,11 @@ class AvailableTermsFilterTest extends ServiceTestCase
         $timeSheet->setFromDate($date);
         $timeSheet->setToDate($date);
 
-        return [$timeSheet];
+        return [
+            [
+                [$timeSheet]
+            ]
+        ];
     }
 
     /**
@@ -91,7 +100,7 @@ class AvailableTermsFilterTest extends ServiceTestCase
      *
      * @return TimeSheet[]
      */
-    public function bookedTermsWithMoreTimeSheetsDataProvider()
+    public static function bookedTermsWithMoreTimeSheetsDataProvider()
     {
         $date = new DateTime('now');
         $firstTimeSheet = new TimeSheet();
@@ -102,7 +111,11 @@ class AvailableTermsFilterTest extends ServiceTestCase
         $secondTimeSheet->setFromDate($futureDate);
         $secondTimeSheet->setToDate($futureDate);
 
-        return [$firstTimeSheet, $secondTimeSheet];
+        return [
+            [
+                [$firstTimeSheet, $secondTimeSheet]
+            ]
+        ];
     }
 
     public function testNotFoundFilter()
